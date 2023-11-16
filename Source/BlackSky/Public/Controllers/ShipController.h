@@ -7,49 +7,59 @@
 #include "InputActionValue.h"
 #include "ShipController.generated.h"
 
-class UInputMappingContext;
-class UInputAction;
-class UNiagaraSystem;
-
-
+/**
+ * 
+ */
 UCLASS()
 class BLACKSKY_API AShipController : public APlayerController
 {
 	GENERATED_BODY()
 
+private:
+	
+	bool bLookLock = false;
+
 public:
+	
 	AShipController();
 
-	/** Time Threshold to know if it was a short press */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
-	float ShortPressThreshold;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	class UInputMappingContext* ShipMappingContext;
 
-	/** FX Class that we will spawn when clicking */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
-	UNiagaraSystem* FXCursor;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	class UInputAction* MoveAction;
 
-	/** MappingContext */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
-	UInputMappingContext* ShipMappingContext;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	class UInputAction* BreakAction;
 	
-	/** Move Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
-	UInputAction* MoveAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	class  UInputAction* LookAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	class  UInputAction* LookLockAction;
+
+	UFUNCTION(BlueprintCallable, Category = "Properties")
+	void OnSliderValueChanged(float Value);
+
 
 protected:
 
-	virtual void SetupInputComponent() override;
-
 	virtual void BeginPlay() override;
 
-	/** Input handlers for SetDestination action. */
-	void OnMoveStarted(const FInputActionValue& Value);
-	void OnMoveTriggered(const FInputActionValue& Value);
-	void OnMoveReleased(const FInputActionValue& Value);
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UStaticMeshComponent* PlaneComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Properties")
+	float ZValue = 0;
+
+	void Look(const FInputActionValue& Value);
+	void Move(const FInputActionValue& Value);
+	void LookLock(const FInputActionValue& Value);
+
+	void StartMove();
 
 
-private:
-	FVector CachedDestination;
 
-	float FollowTime;	
+	virtual void SetupInputComponent() override;
+	
 };
